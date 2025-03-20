@@ -1,0 +1,1 @@
+/usr/bin/atlks/cv2x_sw_config.txt

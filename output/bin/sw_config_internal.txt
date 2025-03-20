@@ -1,0 +1,1 @@
+/usr/bin/atlks/sw_config_internal.txt
