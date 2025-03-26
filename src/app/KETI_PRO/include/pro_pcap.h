@@ -4,8 +4,9 @@
 #include <time.h>      // Time functions: time, localtime, etc.
 #include <sys/time.h>  // Time functions: gettimeofday, struct timeval, etc.
 #include <stdbool.h>   // Boolean type support: bool, true, false.
+#ifdef _D_PCAP_USED
 #include <pcap/pcap.h>      // Packet capture library functions: pcap_open, pcap_close, pcap_dump, etc.
-
+#endif
 #ifndef _D_HEADER_PRO_PCAP
 #define _D_HEADER_PRO_PCAP
 
@@ -15,6 +16,7 @@
 #define PRO_PCAP_DEFAULT_FILE_PATH "./f_db/pcap/"
 
 struct pro_config_pcap_t{
+    bool pcap_enable;
     char pcap_file_path[256];
     bool pcap_file_sub_path_enable;
     char pcap_file_name_header_0[256];

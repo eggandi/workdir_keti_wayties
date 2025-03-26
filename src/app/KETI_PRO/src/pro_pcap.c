@@ -3,8 +3,13 @@
 #include "config.h"
 
 // 준-전역변수
+#ifdef _D_PCAP_USED
 pcap_t *g_pcap_dead = NULL;
 pcap_dumper_t *g_pd   = NULL;
+#else
+char *g_pcap_dead = NULL;
+char *g_pd = NULL;
+#endif
 void **g_pd_ptr = NULL;
 void **g_fpfn_ptr = NULL;
 bool g_pcap_add_used;
@@ -75,10 +80,13 @@ extern int PRO_Pcap_Init(void **pd_ptr, const char *filename, const char *path)
 
 extern int PRO_Pcap_Open(void **pd_ptr, const char *fpfn)
 {
+    pd_ptr = pd_ptr;
+    fpfn = fpfn;
     if(g_pcap_dead != NULL)
     {
         PRO_Pcap_Close();
     }
+#ifdef _D_PCAP_USED
     g_pcap_dead = pcap_open_dead(DLT_USER0, 65535);
     if (!g_pcap_dead) {
         fprintf(stderr, "pcap_open_dead() failed\n");
@@ -97,7 +105,6 @@ extern int PRO_Pcap_Open(void **pd_ptr, const char *fpfn)
             g_pd = (pcap_dumper_t *)*pd_ptr;
             printf("pd_ptr : %p\n", *pd_ptr);
         }
-
     }else{
         g_pd_ptr = malloc(sizeof(pcap_dumper_t*));
         *g_pd_ptr = (pcap_dumper_t *)pcap_dump_open(g_pcap_dead, fpfn);
@@ -110,7 +117,7 @@ extern int PRO_Pcap_Open(void **pd_ptr, const char *fpfn)
             printf("pd_ptr : %p\n", *g_pd_ptr);
         }
     }
-    
+#endif
     return 0;
 }
 /**
@@ -119,12 +126,16 @@ extern int PRO_Pcap_Open(void **pd_ptr, const char *fpfn)
  */
 extern void PRO_Pcap_Close(void)
 {
+
+
     if(g_pd == NULL)
     {
     }else{
+#ifdef _D_PCAP_USED
         pcap_dump_close(g_pd);
+#endif
     }
-
+#ifdef _D_PCAP_USED
     if(g_pcap_dead == NULL)
     {
         return;
@@ -138,6 +149,7 @@ extern void PRO_Pcap_Close(void)
     {
         free(g_fpfn_ptr);
     }
+#endif
     return;
 }
 
@@ -150,7 +162,11 @@ extern void PRO_Pcap_Close(void)
  */
 extern int PRO_Pcap_Add(void *pd, const unsigned char *data, size_t len)
 {
+    pd = pd;
+    data = data;
+    len = len;
     g_pcap_add_used = true;
+#ifdef _D_PCAP_USED
     struct pcap_pkthdr header;
     memset(&header, 0, sizeof(header));
 
@@ -171,6 +187,7 @@ extern int PRO_Pcap_Add(void *pd, const unsigned char *data, size_t len)
     }else{
         pcap_dump((u_char *)pd, &header, data);
     }
+#endif
     g_pcap_add_used = false;
     return 0;
 }

@@ -195,6 +195,8 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/config.c.o: src/app/KETI_PRO/src/co
   /usr/include/aarch64-linux-gnu/bits/pthread_stack_min.h \
   /usr/include/aarch64-linux-gnu/sys/timerfd.h \
   /usr/include/aarch64-linux-gnu/bits/timerfd.h \
+  /usr/include/getopt.h \
+  /usr/include/aarch64-linux-gnu/bits/getopt_ext.h \
   src/app/KETI_PRO/include/pro_v2x.h \
   /usr/lib/gcc/aarch64-linux-gnu/11/include/stdint.h \
   /usr/include/stdint.h \
@@ -207,16 +209,6 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/config.c.o: src/app/KETI_PRO/src/co
   depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-api.h \
   src/app/KETI_PRO/include/pro_pcap.h \
   /usr/include/aarch64-linux-gnu/sys/time.h \
-  /usr/include/pcap/pcap.h \
-  /usr/include/pcap/funcattrs.h \
-  /usr/include/pcap/compiler-tests.h \
-  /usr/include/pcap/pcap-inttypes.h \
-  /usr/include/pcap/socket.h \
-  /usr/include/netdb.h \
-  /usr/include/rpc/netdb.h \
-  /usr/include/aarch64-linux-gnu/bits/netdb.h \
-  /usr/include/pcap/bpf.h \
-  /usr/include/pcap/dlt.h \
   src/app/KETI_PRO/include/utils.h \
   /usr/include/libudev.h \
   /usr/include/aarch64-linux-gnu/sys/sysmacros.h \
@@ -338,7 +330,41 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/gnss.c.o: src/app/KETI_PRO/src/gnss
   /usr/include/aarch64-linux-gnu/bits/termios-misc.h \
   /usr/include/aarch64-linux-gnu/sys/ttydefaults.h \
   src/app/KETI_PRO/include/buffer.h \
-  /usr/lib/gcc/aarch64-linux-gnu/11/include/stdbool.h
+  /usr/lib/gcc/aarch64-linux-gnu/11/include/stdbool.h \
+  src/app/KETI_PRO/include/config.h \
+  /usr/include/aarch64-linux-gnu/sys/stat.h \
+  /usr/include/pthread.h \
+  /usr/include/sched.h \
+  /usr/include/aarch64-linux-gnu/bits/sched.h \
+  /usr/include/aarch64-linux-gnu/bits/types/struct_sched_param.h \
+  /usr/include/aarch64-linux-gnu/bits/cpu-set.h \
+  /usr/include/time.h \
+  /usr/include/aarch64-linux-gnu/bits/time.h \
+  /usr/include/aarch64-linux-gnu/bits/types/struct_tm.h \
+  /usr/include/aarch64-linux-gnu/bits/types/struct_itimerspec.h \
+  /usr/include/aarch64-linux-gnu/bits/setjmp.h \
+  /usr/include/aarch64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/aarch64-linux-gnu/bits/pthread_stack_min-dynamic.h \
+  /usr/include/aarch64-linux-gnu/bits/pthread_stack_min.h \
+  /usr/include/aarch64-linux-gnu/sys/timerfd.h \
+  /usr/include/aarch64-linux-gnu/bits/timerfd.h \
+  /usr/include/getopt.h \
+  /usr/include/aarch64-linux-gnu/bits/getopt_ext.h \
+  src/app/KETI_PRO/include/pro_v2x.h \
+  /usr/include/inttypes.h \
+  depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal.h \
+  depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-defines.h \
+  depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-types.h \
+  depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-api-params.h \
+  depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-api.h \
+  src/app/KETI_PRO/include/pro_pcap.h \
+  /usr/include/aarch64-linux-gnu/sys/time.h \
+  src/app/KETI_PRO/include/utils.h \
+  /usr/include/libudev.h \
+  /usr/include/aarch64-linux-gnu/sys/sysmacros.h \
+  /usr/include/aarch64-linux-gnu/bits/sysmacros.h \
+  /usr/include/aarch64-linux-gnu/sys/epoll.h \
+  /usr/include/aarch64-linux-gnu/bits/epoll.h
 
 src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/main.c.o: src/app/KETI_PRO/src/main.c \
   /usr/include/stdc-predef.h \
@@ -504,6 +530,8 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/main.c.o: src/app/KETI_PRO/src/main
   /usr/include/aarch64-linux-gnu/bits/sigthread.h \
   /usr/include/aarch64-linux-gnu/bits/signal_ext.h \
   src/app/KETI_PRO/include/config.h \
+  /usr/include/getopt.h \
+  /usr/include/aarch64-linux-gnu/bits/getopt_ext.h \
   src/app/KETI_PRO/include/pro_v2x.h \
   /usr/include/inttypes.h \
   depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal.h \
@@ -512,16 +540,6 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/main.c.o: src/app/KETI_PRO/src/main
   depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-api-params.h \
   depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-api.h \
   src/app/KETI_PRO/include/pro_pcap.h \
-  /usr/include/pcap/pcap.h \
-  /usr/include/pcap/funcattrs.h \
-  /usr/include/pcap/compiler-tests.h \
-  /usr/include/pcap/pcap-inttypes.h \
-  /usr/include/pcap/socket.h \
-  /usr/include/netdb.h \
-  /usr/include/rpc/netdb.h \
-  /usr/include/aarch64-linux-gnu/bits/netdb.h \
-  /usr/include/pcap/bpf.h \
-  /usr/include/pcap/dlt.h \
   src/app/KETI_PRO/include/utils.h \
   /usr/include/libudev.h \
   /usr/include/aarch64-linux-gnu/sys/sysmacros.h \
@@ -598,40 +616,6 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/pro_pcap.c.o: src/app/KETI_PRO/src/
   /usr/include/aarch64-linux-gnu/bits/types/struct_itimerspec.h \
   /usr/include/aarch64-linux-gnu/sys/time.h \
   /usr/lib/gcc/aarch64-linux-gnu/11/include/stdbool.h \
-  /usr/include/pcap/pcap.h \
-  /usr/include/pcap/funcattrs.h \
-  /usr/include/pcap/compiler-tests.h \
-  /usr/include/pcap/pcap-inttypes.h \
-  /usr/include/inttypes.h \
-  /usr/lib/gcc/aarch64-linux-gnu/11/include/stdint.h \
-  /usr/include/stdint.h \
-  /usr/include/aarch64-linux-gnu/bits/wchar.h \
-  /usr/include/aarch64-linux-gnu/bits/stdint-uintn.h \
-  /usr/include/pcap/socket.h \
-  /usr/include/aarch64-linux-gnu/sys/socket.h \
-  /usr/include/aarch64-linux-gnu/bits/types/struct_iovec.h \
-  /usr/include/aarch64-linux-gnu/bits/socket.h \
-  /usr/include/aarch64-linux-gnu/bits/socket_type.h \
-  /usr/include/aarch64-linux-gnu/bits/sockaddr.h \
-  /usr/include/aarch64-linux-gnu/asm/socket.h \
-  /usr/include/asm-generic/socket.h \
-  /usr/include/linux/posix_types.h \
-  /usr/include/linux/stddef.h \
-  /usr/include/aarch64-linux-gnu/asm/posix_types.h \
-  /usr/include/asm-generic/posix_types.h \
-  /usr/include/aarch64-linux-gnu/asm/bitsperlong.h \
-  /usr/include/asm-generic/bitsperlong.h \
-  /usr/include/aarch64-linux-gnu/asm/sockios.h \
-  /usr/include/asm-generic/sockios.h \
-  /usr/include/aarch64-linux-gnu/bits/types/struct_osockaddr.h \
-  /usr/include/netdb.h \
-  /usr/include/netinet/in.h \
-  /usr/include/aarch64-linux-gnu/bits/in.h \
-  /usr/include/rpc/netdb.h \
-  /usr/include/aarch64-linux-gnu/bits/netdb.h \
-  /usr/include/arpa/inet.h \
-  /usr/include/pcap/bpf.h \
-  /usr/include/pcap/dlt.h \
   src/app/KETI_PRO/include/utils.h \
   /usr/include/unistd.h \
   /usr/include/aarch64-linux-gnu/bits/posix_opt.h \
@@ -655,6 +639,10 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/pro_pcap.c.o: src/app/KETI_PRO/src/
   /usr/include/aarch64-linux-gnu/sys/sysmacros.h \
   /usr/include/aarch64-linux-gnu/bits/sysmacros.h \
   /usr/include/aarch64-linux-gnu/sys/epoll.h \
+  /usr/lib/gcc/aarch64-linux-gnu/11/include/stdint.h \
+  /usr/include/stdint.h \
+  /usr/include/aarch64-linux-gnu/bits/wchar.h \
+  /usr/include/aarch64-linux-gnu/bits/stdint-uintn.h \
   /usr/include/aarch64-linux-gnu/bits/epoll.h \
   /usr/include/aarch64-linux-gnu/sys/stat.h \
   src/app/KETI_PRO/include/config.h \
@@ -670,6 +658,25 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/pro_pcap.c.o: src/app/KETI_PRO/src/
   /usr/include/aarch64-linux-gnu/bits/termios-tcflow.h \
   /usr/include/aarch64-linux-gnu/bits/termios-misc.h \
   /usr/include/aarch64-linux-gnu/sys/ttydefaults.h \
+  /usr/include/arpa/inet.h \
+  /usr/include/netinet/in.h \
+  /usr/include/aarch64-linux-gnu/sys/socket.h \
+  /usr/include/aarch64-linux-gnu/bits/types/struct_iovec.h \
+  /usr/include/aarch64-linux-gnu/bits/socket.h \
+  /usr/include/aarch64-linux-gnu/bits/socket_type.h \
+  /usr/include/aarch64-linux-gnu/bits/sockaddr.h \
+  /usr/include/aarch64-linux-gnu/asm/socket.h \
+  /usr/include/asm-generic/socket.h \
+  /usr/include/linux/posix_types.h \
+  /usr/include/linux/stddef.h \
+  /usr/include/aarch64-linux-gnu/asm/posix_types.h \
+  /usr/include/asm-generic/posix_types.h \
+  /usr/include/aarch64-linux-gnu/asm/bitsperlong.h \
+  /usr/include/asm-generic/bitsperlong.h \
+  /usr/include/aarch64-linux-gnu/asm/sockios.h \
+  /usr/include/asm-generic/sockios.h \
+  /usr/include/aarch64-linux-gnu/bits/types/struct_osockaddr.h \
+  /usr/include/aarch64-linux-gnu/bits/in.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/aarch64-linux-gnu/bits/sched.h \
@@ -681,7 +688,10 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/pro_pcap.c.o: src/app/KETI_PRO/src/
   /usr/include/aarch64-linux-gnu/bits/pthread_stack_min.h \
   /usr/include/aarch64-linux-gnu/sys/timerfd.h \
   /usr/include/aarch64-linux-gnu/bits/timerfd.h \
+  /usr/include/getopt.h \
+  /usr/include/aarch64-linux-gnu/bits/getopt_ext.h \
   src/app/KETI_PRO/include/pro_v2x.h \
+  /usr/include/inttypes.h \
   depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal.h \
   depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-defines.h \
   depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-types.h \
@@ -826,19 +836,11 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/pro_v2x.c.o: src/app/KETI_PRO/src/p
   /usr/include/aarch64-linux-gnu/bits/pthread_stack_min.h \
   /usr/include/aarch64-linux-gnu/sys/timerfd.h \
   /usr/include/aarch64-linux-gnu/bits/timerfd.h \
+  /usr/include/getopt.h \
+  /usr/include/aarch64-linux-gnu/bits/getopt_ext.h \
   src/app/KETI_PRO/include/pro_v2x.h \
   src/app/KETI_PRO/include/pro_pcap.h \
   /usr/include/aarch64-linux-gnu/sys/time.h \
-  /usr/include/pcap/pcap.h \
-  /usr/include/pcap/funcattrs.h \
-  /usr/include/pcap/compiler-tests.h \
-  /usr/include/pcap/pcap-inttypes.h \
-  /usr/include/pcap/socket.h \
-  /usr/include/netdb.h \
-  /usr/include/rpc/netdb.h \
-  /usr/include/aarch64-linux-gnu/bits/netdb.h \
-  /usr/include/pcap/bpf.h \
-  /usr/include/pcap/dlt.h \
   src/app/KETI_PRO/include/utils.h \
   /usr/include/libudev.h \
   /usr/include/aarch64-linux-gnu/sys/sysmacros.h \
@@ -982,6 +984,8 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/utils.c.o: src/app/KETI_PRO/src/uti
   /usr/include/aarch64-linux-gnu/bits/pthread_stack_min.h \
   /usr/include/aarch64-linux-gnu/sys/timerfd.h \
   /usr/include/aarch64-linux-gnu/bits/timerfd.h \
+  /usr/include/getopt.h \
+  /usr/include/aarch64-linux-gnu/bits/getopt_ext.h \
   src/app/KETI_PRO/include/pro_v2x.h \
   /usr/include/inttypes.h \
   depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal.h \
@@ -991,16 +995,6 @@ src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/src/utils.c.o: src/app/KETI_PRO/src/uti
   depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-api.h \
   src/app/KETI_PRO/include/pro_pcap.h \
   /usr/include/aarch64-linux-gnu/sys/time.h \
-  /usr/include/pcap/pcap.h \
-  /usr/include/pcap/funcattrs.h \
-  /usr/include/pcap/compiler-tests.h \
-  /usr/include/pcap/pcap-inttypes.h \
-  /usr/include/pcap/socket.h \
-  /usr/include/netdb.h \
-  /usr/include/rpc/netdb.h \
-  /usr/include/aarch64-linux-gnu/bits/netdb.h \
-  /usr/include/pcap/bpf.h \
-  /usr/include/pcap/dlt.h \
   src/app/KETI_PRO/include/utils.h \
   src/app/KETI_PRO/include/main.h \
   /usr/include/signal.h \
@@ -1068,11 +1062,15 @@ src/app/KETI_PRO/src/pro_pcap.c:
 
 /usr/include/aarch64-linux-gnu/bits/sigcontext.h:
 
+/usr/include/aarch64-linux-gnu/bits/sigaction.h:
+
 /usr/include/aarch64-linux-gnu/bits/sigevent-consts.h:
 
 /usr/include/aarch64-linux-gnu/bits/types/sigevent_t.h:
 
 /usr/include/aarch64-linux-gnu/bits/siginfo-consts.h:
+
+/usr/include/aarch64-linux-gnu/bits/siginfo-arch.h:
 
 /usr/include/aarch64-linux-gnu/bits/types/__sigval_t.h:
 
@@ -1096,20 +1094,6 @@ src/app/KETI_PRO/src/gnss.c:
 
 /usr/include/libudev.h:
 
-/usr/include/aarch64-linux-gnu/bits/sigaction.h:
-
-/usr/include/pcap/bpf.h:
-
-/usr/include/aarch64-linux-gnu/bits/netdb.h:
-
-/usr/include/pcap/pcap-inttypes.h:
-
-/usr/include/aarch64-linux-gnu/bits/siginfo-arch.h:
-
-/usr/include/pcap/compiler-tests.h:
-
-/usr/include/pcap/funcattrs.h:
-
 depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-api.h:
 
 depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-types.h:
@@ -1117,8 +1101,6 @@ depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-types.h:
 depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal-defines.h:
 
 depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal.h:
-
-/usr/include/pcap/pcap.h:
 
 /usr/include/aarch64-linux-gnu/bits/wchar.h:
 
@@ -1128,7 +1110,7 @@ depend/v2x-sw/include/kvh1a/ltev2x-hal/ltev2x-hal.h:
 
 src/app/KETI_PRO/include/pro_v2x.h:
 
-/usr/include/rpc/netdb.h:
+/usr/include/getopt.h:
 
 /usr/include/aarch64-linux-gnu/bits/timerfd.h:
 
@@ -1286,8 +1268,6 @@ src/app/KETI_PRO/src/utils.c:
 
 /usr/include/aarch64-linux-gnu/bits/environments.h:
 
-/usr/include/pcap/socket.h:
-
 /usr/include/aarch64-linux-gnu/bits/timesize.h:
 
 /usr/include/aarch64-linux-gnu/bits/select.h:
@@ -1352,9 +1332,9 @@ src/app/KETI_PRO/src/pro_v2x.c:
 
 /usr/include/asm-generic/errno-base.h:
 
-/usr/include/aarch64-linux-gnu/bits/termios-c_iflag.h:
+/usr/include/aarch64-linux-gnu/bits/getopt_ext.h:
 
-/usr/include/netdb.h:
+/usr/include/aarch64-linux-gnu/bits/termios-c_iflag.h:
 
 /usr/include/aarch64-linux-gnu/bits/types/struct_timespec.h:
 
@@ -1425,7 +1405,5 @@ src/app/KETI_PRO/src/pro_v2x.c:
 /usr/include/fcntl.h:
 
 /usr/include/aarch64-linux-gnu/bits/types/struct_tm.h:
-
-/usr/include/pcap/dlt.h:
 
 /usr/include/aarch64-linux-gnu/bits/pthread_stack_min.h:

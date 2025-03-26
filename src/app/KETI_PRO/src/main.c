@@ -9,12 +9,17 @@
 
 static void PRO_Main_Signal_Set();
 
+int g_sockfd;
+struct sockaddr_in g_v2x_addr;
 pthread_t g_thread_gnss;
 pthread_t g_thread_sdcard_active_mount;
-int main()
+int main(int argc, char *argv[])
 {
+
     int ret;
-    ret = PRO_Initial_Setup_Configuration_Read(&G_pro_config);
+    ret = PRO_Config_Pasrsing_Argument(argc, argv);
+
+    ret = PRO_Config_Setup_Configuration_Read(&G_pro_config);
     if(ret < 0)
     {
         printf("Configuration read failed.\n");
@@ -51,27 +56,41 @@ int main()
     }else{
         printf("V2X initialization success.\n");
     }
-    struct buffer_array_setup_t setup;
-    setup.buffer_size = 2048;
-    setup.buffer_ptr = NULL;
 
-    struct pro_buffer_t *usr_buf_ptr = Pro_Buffer_Array_Init(&setup);
-    if (usr_buf_ptr == NULL)
+#ifdef _D_PCAP_USED
+    void **pd_ptr
+#endif
+    if(G_pro_config.pcap.pcap_enable == true)
     {
-        printf("Buffer initialization failed.\n");
-        return -1;
+#ifdef _D_PCAP_USED
+
+        struct buffer_array_setup_t setup;
+        setup.buffer_size = 2048;
+        setup.buffer_ptr = NULL;
+
+        struct pro_buffer_t *usr_buf_ptr = Pro_Buffer_Array_Init(&setup);
+        if (usr_buf_ptr == NULL)
+        {
+            printf("Buffer initialization failed.\n");
+            return -1;
+        }else{
+            printf("Buffer initialization success. %p\n", usr_buf_ptr);
+        }
+        pd_ptr = malloc(sizeof(pcap_dumper_t*));
+
+        ret = PRO_Pcap_Init(pd_ptr, NULL, NULL);
+        if(ret < 0)
+        {
+            printf("PCAP initialization failed.\n");
+            goto out;
+        }
+        pthread_create(&g_thread_gnss, NULL, PRO_UBLOX_Gnss_Thread, (void*)usr_buf_ptr);
+#endif
     }else{
-        printf("Buffer initialization success. %p\n", usr_buf_ptr);
+        pthread_create(&g_thread_gnss, NULL, PRO_UBLOX_Gnss_Thread, (void*)NULL);
     }
-    void **pd_ptr = malloc(sizeof(pcap_dumper_t*));
-    ret = PRO_Pcap_Init(pd_ptr, NULL, NULL);
-    if(ret < 0)
-    {
-        printf("PCAP initialization failed.\n");
-        goto out;
-    }
-    //pthread_create(&g_thread_gnss, NULL, PRO_UBLOX_Gnss_Thread, (void*)usr_buf_ptr);
-    //pthread_detach(g_thread_gnss);
+    
+    pthread_detach(g_thread_gnss);
 
 	struct itimerspec itval;
     int msec = 1000;
@@ -92,6 +111,28 @@ int main()
             perror("read");
             break;
         }
+        if(G_pro_config.pcap.pcap_enable == true)
+        {
+            do{
+                struct pro_default_buffer_array_t out_buf = {.data = NULL, .id = 0, .size = 0, .next = NULL, .prev = NULL};
+                ret = Pro_Buffer_Array_Pop(&out_buf, NULL);
+                if(ret > 0 )
+                {   
+                    PRO_Pcap_Add(NULL, (const unsigned char *)out_buf.data, (uint32_t)out_buf.size);
+                    pcap_num++;
+                    printf("[PCAP_ADD], data_id:%d, pcap_num : %ld\n", out_buf.id, pcap_num); 
+                    free(out_buf.data);
+                }
+                usleep(1);
+            } while(ret != 0); 
+        }
+            
+    }
+    pthread_cancel(g_thread_gnss);
+out:
+    LTEV2XHAL_Close();
+    if(G_pro_config.pcap.pcap_enable == true)
+    {
         do{
             struct pro_default_buffer_array_t out_buf = {.data = NULL, .id = 0, .size = 0, .next = NULL, .prev = NULL};
             ret = Pro_Buffer_Array_Pop(&out_buf, NULL);
@@ -99,33 +140,16 @@ int main()
             {   
                 PRO_Pcap_Add(NULL, (const unsigned char *)out_buf.data, (uint32_t)out_buf.size);
                 pcap_num++;
-                printf("[PCAP_ADD], data_id:%d, pcap_num : %ld\n", out_buf.id, pcap_num); 
                 free(out_buf.data);
             }
-            usleep(1);
+            usleep(1 * 1000);
         } while(ret != 0); 
-            
+#ifdef _D_PCAP_USED
+        free(pd_ptr);
+#endif
     }
-    pthread_cancel(g_thread_gnss);
-out:
-    LTEV2XHAL_Close();
-    do{
-        struct pro_default_buffer_array_t out_buf = {.data = NULL, .id = 0, .size = 0, .next = NULL, .prev = NULL};
-        ret = Pro_Buffer_Array_Pop(&out_buf, NULL);
-        if(ret > 0 )
-        {   
-            PRO_Pcap_Add(NULL, (const unsigned char *)out_buf.data, (uint32_t)out_buf.size);
-            pcap_num++;
-            free(out_buf.data);
-        }
-        usleep(1 * 1000);
-    } while(ret != 0); 
-
-    free(pd_ptr);
     return 0;
 }
-
-
 
 static void PRO_Main_Signal_Set()
 {
@@ -156,11 +180,15 @@ extern void PRO_Main_Signal_Handler(int signo)
             (void)signo;
             G_pro_config.v2x.tx_running = false;
             LTEV2XHAL_Close();
+            if(g_sockfd > 0)
+                close(g_sockfd);
             exit(0);
+            system("killall pro_pcap");
             break;
         }
         default:
         {
+            system("killall pro_pcap");
             exit(0);
             break;
         }

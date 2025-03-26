@@ -1,0 +1,11 @@
+#!/bin/bash
+sudo tcpdump -i lo udp -Q in -nnvv -l > ./udp.log &
+while true; do
+    count=$(wc -l < ./udp.log)
+
+    echo "$(date +%H:%M:%S) - 1초 동안 UDP 패킷: $count"
+    : > ./udp.log   # 파일 비우기 (지우지 말고 내용을 비움)
+    sleep 1
+done
+
+

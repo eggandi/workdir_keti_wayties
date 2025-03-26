@@ -2,23 +2,37 @@
 #include "utils.h"
 
 struct pro_config_t G_pro_config;
-static void PRO_Initial_Setup_Configuration_Value_Input(char type, char *value, size_t value_len, void* out_value);
+
+static char *g_argu_uIP_str = NULL;
+static char *g_config_path = NULL;
+static char *g_config_rxch = NULL;
+static void PRO_Config_Setup_Configuration_Value_Input(char type, char *value, size_t value_len, void* out_value);
+static int PRO_Config_ParsedOption(int option);
+
 /**
  * @brief config 파일을 읽어서 V2X 핸드오버 장치의 초기설정 
  * 
  * @param  
  * @return int 0 | error code
  */
-extern int PRO_Initial_Setup_Configuration_Read(struct pro_config_t *pro_config)
+extern int PRO_Config_Setup_Configuration_Read(struct pro_config_t *pro_config)
 {
     int ret;
     // config 경로가 존재하는지 확인
-    ret = access(PRO_INITAIL_SETUP_CONFIGURAION_FILE_PATH, F_OK);
+    char *config_path;
+    if(g_config_path == NULL)    
+    {
+        config_path = PRO_INITAIL_SETUP_CONFIGURAION_FILE_PATH;
+    }else{
+        config_path = g_config_path;
+    }
+    printf("config_path:%s\n", config_path);
+    ret = access(config_path, F_OK);
     if(ret < 0)
     {
         char sys_cmd[256] = {0}; 
         // mkdir 명령어에 대한 결과값 체크
-        snprintf(sys_cmd, sizeof(sys_cmd), "mkdir -m 777 -p %s", PRO_INITAIL_SETUP_CONFIGURAION_FILE_PATH);
+        snprintf(sys_cmd, sizeof(sys_cmd), "mkdir -m 777 -p %s", config_path);
         ret = system(sys_cmd);
         if(ret != 0)
         {
@@ -29,7 +43,7 @@ extern int PRO_Initial_Setup_Configuration_Read(struct pro_config_t *pro_config)
     
     // config 파일 경로 생성 (경로 + "/" + 파일명 + 널 종료 문자)
     char *config_file_name = PRO_INITAIL_SETUP_CONFIGURAION_FILE_NAME;
-    size_t path_len = strlen(PRO_INITAIL_SETUP_CONFIGURAION_FILE_PATH);
+    size_t path_len = strlen(config_path);
     size_t name_len = strlen(config_file_name);
     size_t total_len = path_len + 1 + name_len + 1;
     char *config_file = (char*)malloc(total_len);
@@ -38,9 +52,8 @@ extern int PRO_Initial_Setup_Configuration_Read(struct pro_config_t *pro_config)
         printf("Memory allocation failed\n");
         return -1;
     }
-    snprintf(config_file, total_len, "%s/%s", PRO_INITAIL_SETUP_CONFIGURAION_FILE_PATH, config_file_name);
+    snprintf(config_file, total_len, "%s/%s", config_path, config_file_name);
     
-
     ret = access(config_file, F_OK);
     if(ret < 0)
     {
@@ -53,15 +66,7 @@ extern int PRO_Initial_Setup_Configuration_Read(struct pro_config_t *pro_config)
             return -1;
         }
 
-        fputs("Configuration_Enable=0x00;\n", config_fp);
-
-        fputs("----------------------------------------Utils---------------------------------------;\n", config_fp);
-        fputs("----------------------------------------Mount;\n", config_fp);
-        fputs("Utils_Mount_Enable=0;\t\t\t(0:Disable, 1:Enable\n", config_fp);
-        fputs("Utils_Mount_Active_Mode=0;\t\t\t(0:No, 1:Auto_Mounting)\n", config_fp);
-        fputs("Utils_Mount_Type=0;\t\t\t(0:SD_Card)\n", config_fp);
-        fputs("Utils_Mount_Device=\"/dev/mmcblk1\";\n", config_fp);
-        fputs("Utils_Mount_Path=\"/mnt/sdcard\";\n", config_fp);
+        fputs("Configuration_Enable=0x01;\n", config_fp);
         fputs("\n", config_fp);
         fputs("----------------------------------------V2X-----------------------------------------;\n", config_fp);
         fputs("V2X_Operation_Type=0;\t\t\t(0:rx only, 1:trx)\n", config_fp);
@@ -82,8 +87,27 @@ extern int PRO_Initial_Setup_Configuration_Read(struct pro_config_t *pro_config)
         fputs("V2X_Tx_WSM_Body_Len=100;\n", config_fp);
         fputs("V2X_Tx_Interval=100000;\n", config_fp);
         fputs("\n", config_fp);
-#if 1
+        
+        fputs("----------------------------------------UDP-----------------------------------------;\n", config_fp);
+        fputs("UDP_Enable=1;\n", config_fp);
+        fputs("UDP_IP_Address=\"127.0.0.1\";\n", config_fp);
+        fputs("UDP_PORT_V2X=14000;\n", config_fp);
+        fputs("UDP_PORT_GNSS=13000;\n", config_fp);
+        fputs("UDP_PORT_GNSS_DAEMON=12000;\n", config_fp);
+        fputs("\n", config_fp);
+#ifdef _D_MOUNT_USED
+        fputs("----------------------------------------Utils---------------------------------------;\n", config_fp);
+        fputs("----------------------------------------Mount;\n", config_fp);
+        fputs("Utils_Mount_Enable=0;\t\t\t(0:Disable, 1:Enable\n", config_fp);
+        fputs("Utils_Mount_Active_Mode=0;\t\t\t(0:No, 1:Auto_Mounting)\n", config_fp);
+        fputs("Utils_Mount_Type=0;\t\t\t(0:SD_Card)\n", config_fp);
+        fputs("Utils_Mount_Device=\"/dev/mmcblk1\";\n", config_fp);
+        fputs("Utils_Mount_Path=\"/mnt/sdcard\";\n", config_fp);
+        fputs("\n", config_fp);
+#endif
+#ifdef _D_PCAP_USED
         fputs("----------------------------------------PCAP----------------------------------------;\n", config_fp);
+        fputs("Pcap_Enable=0;\n", config_fp);
         fputs("Pcap_File_Path=\"/mnt/sdcard/pcap/\";\n", config_fp);
         fputs("Pcap_File_Sub_Path_Enable=1;\t\t\t(YYDDMM)\n" , config_fp); 
         fputs("Pcap_File_Name_Header_0=\"KETI\";\n", config_fp); 
@@ -95,12 +119,12 @@ extern int PRO_Initial_Setup_Configuration_Read(struct pro_config_t *pro_config)
 #endif
         fclose(config_fp);
         free(config_file);
-        printf("Fill the config_file in ./config/pro_config.conf\n");
+        printf("Fill the config_file in %s/pro_config.conf\n", g_config_path);
         return 0;
     }
     else
     {
-        FILE *config_fp = fopen(config_file, "r");
+        FILE *config_fp = fopen(config_file, "rw");
         if(!config_fp)
         {
             printf("Failed to open config file for reading\n");
@@ -140,7 +164,7 @@ extern int PRO_Initial_Setup_Configuration_Read(struct pro_config_t *pro_config)
                     
                     if(strcmp(ptr_name, "Configuration_Enable") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->config_enable);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->config_enable);
                         if(pro_config->config_enable == 0x00)
                         {
                             printf("Configuration not enable.\n");
@@ -150,95 +174,131 @@ extern int PRO_Initial_Setup_Configuration_Read(struct pro_config_t *pro_config)
                         }
                     }else if(strcmp(ptr_name, "Utils_Mount_Enable") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->utils.mount.enable);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->utils.mount.enable);
                     }else if(strcmp(ptr_name, "Utils_Mount_Type") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->utils.mount.type);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->utils.mount.type);
                     }else if(strcmp(ptr_name, "Utils_Mount_Active_Mode") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->utils.mount.active_mode);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->utils.mount.active_mode);
                     }else if(strcmp(ptr_name, "Utils_Mount_Device") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->utils.mount.device);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->utils.mount.device);
                     }
                     else if(strcmp(ptr_name, "Utils_Mount_Path") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->utils.mount.path);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->utils.mount.path);
                     }else if(strcmp(ptr_name, "V2X_Operation_Type") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.op);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.op);
                     }else if(strcmp(ptr_name, "V2X_Device_Name") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->v2x.dev_name);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->v2x.dev_name);
                     }else if(strcmp(ptr_name, "V2X_Dbg_Msg_Level") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.dbg);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.dbg);
                     }else if(strcmp(ptr_name, "V2X_Lib_Dbg_Msg_Level") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.lib_dbg);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.lib_dbg);
                     }else if(strcmp(ptr_name, "V2X_LTEV2XHAL_Tx_Type") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_type);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_type);
                     }else if(strcmp(ptr_name, "V2X_Rx_Channel_Num") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.rx_chan_num);
+                        if(g_config_rxch == NULL)
+                        {
+                            PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.rx_chan_num);
+                        }else{
+                            printf("pro_config->v2x.rx_chan_num:%d\n", pro_config->v2x.rx_chan_num);
+
+                            PRO_Config_Setup_Configuration_Value_Input('d', g_config_rxch, strlen(g_config_rxch), (void*)&pro_config->v2x.rx_chan_num);
+                        }
+                        printf("pro_config->v2x.rx_chan_num:%d\n", pro_config->v2x.rx_chan_num);
                     }else if(strcmp(ptr_name, "V2X_Rx_Power") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.rx_power);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.rx_power);
                     }else if(strcmp(ptr_name, "V2X_Rx_Bandwidth") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.rx_bandwidth);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.rx_bandwidth);
                     }else if(strcmp(ptr_name, "V2X_Tx_Channel_Num") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_chan_num);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_chan_num);
                     }else if(strcmp(ptr_name, "V2X_Tx_DataRate") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_datarate);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_datarate);
                     }else if(strcmp(ptr_name, "V2X_Tx_Power") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_power);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_power);
                     }else if(strcmp(ptr_name, "V2X_Tx_Priority") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_priority);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_priority);
                     }else if(strcmp(ptr_name, "V2X_PSID") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.psid);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.psid);
                     }else if(strcmp(ptr_name, "V2X_Tx_WSM_Body_Len") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_wsm_body_len);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_wsm_body_len);
                     }else if(strcmp(ptr_name, "V2X_Tx_Interval") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_interval);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->v2x.tx_interval);
+                    }else if(strcmp(ptr_name, "UDP_Enable") == 0)
+                    {
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->udp_enable);
+                    }else if(strcmp(ptr_name, "UDP_IP_Address") == 0)
+                    {
+                        if(g_argu_uIP_str != NULL)
+                        {
+                            PRO_Config_Setup_Configuration_Value_Input('\"', g_argu_uIP_str, INET_ADDRSTRLEN, (void*)pro_config->udp_ip_str);
+                        }else{
+                            PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->udp_ip_str);
+                        }
+                    }else if(strcmp(ptr_name, "UDP_PORT_V2X") == 0)
+                    {
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->udp_port_v2x);
+                    }else if(strcmp(ptr_name, "UDP_PORT_GNSS") == 0)
+                    {
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->udp_port_gnss);
+                    }else if(strcmp(ptr_name, "UDP_PORT_GNSS_DAEMON") == 0)
+                    {
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->udp_port_gnss_daemon);
+                    }else if(strcmp(ptr_name, "Pcap_Enable") == 0)
+                    {
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_enable);
                     }else if(strcmp(ptr_name, "Pcap_File_Path") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->pcap.pcap_file_path);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->pcap.pcap_file_path);
                     }else if(strcmp(ptr_name, "Pcap_File_Sub_Path_Enable") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_file_sub_path_enable);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_file_sub_path_enable);
                     }else if(strcmp(ptr_name, "Pcap_File_Name_Header_0") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->pcap.pcap_file_name_header_0);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->pcap.pcap_file_name_header_0);
                     }else if(strcmp(ptr_name, "Pcap_File_Name_Header_1") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->pcap.pcap_file_name_header_1);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)pro_config->pcap.pcap_file_name_header_1);
                     }else if(strcmp(ptr_name, "Pcap_File_Name_YYMMDD_Enable") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_file_name_yymmdd_enable);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_file_name_yymmdd_enable);
                     }else if(strcmp(ptr_name, "Pcap_File_Saving_Type") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_file_saving_type);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_file_saving_type);
                     }else if(strcmp(ptr_name, "Pcap_File_Saving_Split_Size") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_file_saving_split_size);  
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_file_saving_split_size);  
                     }else if(strcmp(ptr_name, "Pcap_File_Saving_Rolling_Time") == 0)
                     {
-                        PRO_Initial_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_file_saving_rolling_time);
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_file_saving_rolling_time);
                     }
                 }
             }
         }
         fclose(config_fp);
     }
+    if(g_config_path != NULL)
+        free(g_config_path);
+    if(g_argu_uIP_str != NULL)
+        free(g_argu_uIP_str);
+
     free(config_file);
     return 0;
 }
@@ -253,7 +313,7 @@ extern int PRO_Initial_Setup_Configuration_Read(struct pro_config_t *pro_config)
  * @param out_value 출력값 (메모리 공간에 결과 복사)
  * @return void 
  */
-static void PRO_Initial_Setup_Configuration_Value_Input(char type, char *value, size_t value_len, void* out_value)
+static void PRO_Config_Setup_Configuration_Value_Input(char type, char *value, size_t value_len, void* out_value)
 {
     switch(type)
     {
@@ -314,3 +374,81 @@ static void PRO_Initial_Setup_Configuration_Value_Input(char type, char *value, 
         }
     }
 }
+
+
+/**
+ * @brief 어플리케이션 실행 시 함께 입력된 파라미터들을 파싱하여 관리정보에 저장한다.
+ * @param[in] argc 유틸리티 실행 시 입력되는 명령줄 내 파라미터들의 개수 (유틸리티 실행파일명 포함)
+ * @param[in] argv 유틸리티 실행 시 입력되는 명령줄 내 파라미터들의 문자열 집합 (유틸리티 실행파일명 포함)
+ * @retval 0: 성공
+ * @retval -1: 실패
+ */
+extern int PRO_Config_Pasrsing_Argument(int argc, char *argv[])
+{
+  int c, option_idx = 0;
+  struct option options[] = {
+    {"uIP", required_argument, 0, 1 /*=getopt_long() 호출 시 option_idx 에 반환되는 값*/},
+    {"config_path", required_argument, 0, 2},
+    {"rx_ch", required_argument, 0, 3},
+    {0, 0, 0, 0} // 옵션 배열은 {0,0,0,0} 센티넬에 의해 만료된다.
+  };
+
+  while(1) {
+
+    /*
+     * 옵션 파싱
+     */
+    c = getopt_long(argc, argv, "", options, &option_idx);
+    if (c == -1) {  // 모든 파라미터 파싱 완료
+      break;
+    }
+
+    /*
+     * 파싱된 옵션 처리
+     */
+    int ret = PRO_Config_ParsedOption(c);
+    if (ret < 0) {
+      return ret;
+    }
+  }
+
+  return 0;
+}
+
+
+/**
+ * @brief 옵션값에 따라 각 옵션을 처리한다.
+ * @param[in] option 옵션값 (struct option 의 4번째 멤버변수)
+ * @retval 0: 성공
+ * @retval -1: 실패
+ */
+static int PRO_Config_ParsedOption(int option)
+{
+  switch (option) {
+    case 1: 
+    {
+        g_argu_uIP_str = malloc(sizeof(char) * INET_ADDRSTRLEN);
+        strncpy(g_argu_uIP_str , optarg, INET_ADDRSTRLEN);
+        break;
+    }
+    case 2:
+    {
+        g_config_path = malloc(sizeof(char) * strlen(optarg));
+        strncpy(g_config_path , optarg, strlen(optarg));
+        break;
+    }
+    case 3:
+    {
+        g_config_rxch = malloc(sizeof(char) * strlen(optarg));
+        strncpy(g_config_rxch , optarg, strlen(optarg));
+        break;
+    }
+    default: 
+    {
+      printf("Invalid option\n");
+      return -1;
+    }
+  }
+  return 0;
+}
+

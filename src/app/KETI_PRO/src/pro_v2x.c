@@ -3,6 +3,7 @@
 #include "buffer.h"
 
 uint32_t g_recv_count;
+
 int g_v2x_id = 1;
 
 /**
@@ -29,6 +30,25 @@ extern int PRO_V2X_Init(void)
   }
   LTEV2XHAL_RegisterCallbackProcessMSDU(PRO_V2X_RxMSDUCallback);
 
+
+  if(G_pro_config.udp_enable)
+  {
+    g_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (g_sockfd < 0) {
+        exit(EXIT_FAILURE);
+    }
+    int flags = fcntl(g_sockfd, F_GETFL, 0);
+    fcntl(g_sockfd, F_SETFL, flags | O_NONBLOCK);
+
+    struct linger solinger = { 1, 0 };
+    setsockopt(g_sockfd, SOL_SOCKET, SO_LINGER, &solinger, sizeof(struct linger));
+
+    memset(&g_v2x_addr, 0, sizeof(g_v2x_addr));
+    g_v2x_addr.sin_family = AF_INET;
+    g_v2x_addr.sin_port = htons(G_pro_config.udp_port_v2x);
+    g_v2x_addr.sin_addr.s_addr = inet_addr(G_pro_config.udp_ip_str);
+  }
+
   printf("Success to initialize V2X library\n");
 
   return 0;
@@ -39,11 +59,8 @@ extern int PRO_V2X_Init(void)
  * @param[in] msdu 수신된 MSDU (= WSM 헤더 + WSM body)
  * @param[in] msdu_size 수신된 MSDU의 크기
  */
-
-
 void PRO_V2X_RxMSDUCallback(const uint8_t *msdu, LTEV2XHALMSDUSize msdu_size, struct LTEV2XHALMSDURxParams rx_params)
 {
-  printf("Callback: PRO_V2X_RxMSDUCallback\n");
   if(msdu_size > 0)
   {
     g_recv_count++;
@@ -77,9 +94,21 @@ void PRO_V2X_RxMSDUCallback(const uint8_t *msdu, LTEV2XHALMSDUSize msdu_size, st
     uint8_t payload[4028] = {0,};
     memcpy(payload, &waytis_header, sizeof(struct pro_waytis_header_t));
     memcpy(payload + sizeof(struct pro_waytis_header_t), msdu, msdu_size);
-    Pro_Buffer_Array_Push(payload, sizeof(struct pro_waytis_header_t) + msdu_size, &g_v2x_id, NULL);
+    if(G_pro_config.pcap.pcap_enable)
+    {
+      Pro_Buffer_Array_Push(payload, sizeof(struct pro_waytis_header_t) + msdu_size, &g_v2x_id, NULL);
+    }
+    if(G_pro_config.udp_enable)
+    {
+      int ret;
+      ret = sendto(g_sockfd, payload, sizeof(struct pro_waytis_header_t) + msdu_size, 0, (struct sockaddr *)&g_v2x_addr, sizeof(g_v2x_addr));
+      if(ret > 0)
+      {
+          //printf("Send Sucess. : %d\n", ret);
+      }
+    }
+    
     memset(payload, 0x00, sizeof(payload));
-    printf("Process rx MSDU - waytis_hdr_size: %ld, msdu_size: %u\n", sizeof(struct pro_waytis_header_t) ,msdu_size);
   }
   // 수신 파라미터 출력
   #if 0
@@ -94,3 +123,4 @@ void PRO_V2X_RxMSDUCallback(const uint8_t *msdu, LTEV2XHALMSDUSize msdu_size, st
 
   return;
 }
+

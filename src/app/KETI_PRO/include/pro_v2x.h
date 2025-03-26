@@ -61,7 +61,7 @@ struct pro_config_v2x_t
 {
   Operation op; ///< 어플리케이션 동작 유형
   char dev_name[256]; ///< LTE-V2X 통신 디바이스 이름
-  LTEV2XHALTxType tx_type; ///< 송신 유형
+  LTEV2XHALTxFlowType tx_type; ///< 송신 유형
   unsigned int psid; ///< 송신 또는 수신하고자 하는 PSID
   DbgMsgLevel dbg; ///< 디버그 메시지 출력 레벨
   unsigned int lib_dbg; ///< V2X 라이브러리 디버그 메시지 출력 레벨
@@ -79,5 +79,6 @@ struct pro_config_v2x_t
 };
 
 #endif //?_D_HEADER_PRO_V2X
-
+extern int g_sockfd;
+extern struct sockaddr_in g_v2x_addr;
 extern int PRO_V2X_Init(void);

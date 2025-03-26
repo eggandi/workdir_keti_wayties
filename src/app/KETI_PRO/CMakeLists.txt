@@ -1,5 +1,6 @@
-SET(TARGET_APP pro_pcap)
+SET(TARGET_APP keti_pcap)
 SET(TARGET_ROOT ${CMAKE_CURRENT_LIST_DIR})
+SET(USE_PCAP false)
 
 add_executable(${TARGET_APP})
 
@@ -9,7 +10,11 @@ target_include_directories(${TARGET_APP} PRIVATE ${PROJECT_ROOT}/depend/v2x-sw/i
 
 target_link_options(${TARGET_APP} PRIVATE -Wl,--hash-style=gnu -Wl,--as-needed)
 target_link_directories(${TARGET_APP} PRIVATE ${PROJECT_ROOT}/depend/v2x-sw/lib/kvh1a)
-target_link_libraries(${TARGET_APP} PRIVATE pcap udev pthread rt gps)
+target_link_libraries(${TARGET_APP} PRIVATE udev pthread rt gps)
+if(USE_PCAP)
+    target_link_libraries(${TARGET_APP} PRIVATE pcap)
+    target_compile_definitions(${TARGET_APP} PRIVATE _D_PCAP_USED=true)
+endif()
 target_link_libraries(${TARGET_APP} PRIVATE ltev2x-hal atlkremote_linux_u atlkcv2x atlkcli atlkpoti atlksmx atlktest)
 target_link_libraries(${TARGET_APP} PRIVATE ffasn1-dot3-2016 ffasn1-base)
 

@@ -1,5 +1,6 @@
 #include "gnss.h" 
 #include "buffer.h"
+#include "config.h"
 
 static void PRO_UBLOX_Trance_STR2BIN(char *hex, uint8_t *out_bin, int *out_len);
 static int PRO_UBLOX_Trance_HEX2DEC(char c);
@@ -7,10 +8,6 @@ static int PRO_UBLOX_Trance_HEX2DEC(char c);
 extern void *PRO_UBLOX_Gnss_Thread(void *arg)
 {
     struct pro_buffer_t *usr_buf_pt = (struct pro_buffer_t *)arg;
-    if(usr_buf_pt == NULL)
-    {
-        return NULL;
-    }
     //PRO_UBLOX_Initial_Set();
     // 1) gpsd 서버에 TCP 연결
     int sockfd;
@@ -66,6 +63,31 @@ extern void *PRO_UBLOX_Gnss_Thread(void *arg)
     uint8_t  ck_a_calc = 0, ck_b_calc = 0;
     uint8_t  ck_a_recv, ck_b_recv;
     int id_gnss = 2;
+
+    int udp_socket;
+    struct sockaddr_in gnss_addr;
+    struct sockaddr_in daemon_addr;
+    if(G_pro_config.udp_enable)
+    {
+        udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
+        if (udp_socket < 0) {
+            exit(EXIT_FAILURE);
+        }
+        int flags = fcntl(udp_socket, F_GETFL, 0);
+        fcntl(udp_socket, F_SETFL, flags | O_NONBLOCK);
+
+        struct linger solinger = { 1, 0 };
+        setsockopt(udp_socket, SOL_SOCKET, SO_LINGER, &solinger, sizeof(struct linger));
+       
+        memset(&gnss_addr, 0, sizeof(gnss_addr));
+        gnss_addr.sin_family = AF_INET;
+        gnss_addr.sin_port = htons(G_pro_config.udp_port_gnss);
+        gnss_addr.sin_addr.s_addr = inet_addr(G_pro_config.udp_ip_str);
+        memset(&daemon_addr, 0, sizeof(daemon_addr));
+        daemon_addr.sin_family = AF_INET;
+        daemon_addr.sin_port = htons(G_pro_config.udp_port_gnss_daemon);
+        daemon_addr.sin_addr.s_addr = inet_addr(G_pro_config.udp_ip_str);
+    }
 
     while (1) {
         uint8_t buf[2048] = {0};
@@ -164,7 +186,25 @@ extern void *PRO_UBLOX_Gnss_Thread(void *arg)
                     if (ubx_class == UBX_CLASS_NAV && ubx_id == UBX_ID_PVT) {
                         if (ubx_length == sizeof(ubx_nav_pvt_t)) {
                             //printf("Gnss Data Received %ld\n", sizeof(ubx_nav_pvt_t));
-                            Pro_Buffer_Array_Push(payload, sizeof(ubx_nav_pvt_t), &id_gnss, NULL);
+                            if(usr_buf_pt != NULL)
+                            {
+                                Pro_Buffer_Array_Push(payload, sizeof(ubx_nav_pvt_t), &id_gnss, NULL);
+                            }
+                            if(G_pro_config.udp_enable)
+                            {
+                                int ret;
+                                ret = sendto(udp_socket, payload, sizeof(ubx_nav_pvt_t), 0, (struct sockaddr *)&gnss_addr, sizeof(gnss_addr));
+                                if(ret > 0)
+                                {
+                                    //printf("Send Sucess. : %d\n", ret);
+                                }
+                                usleep(5000);
+                                ret = sendto(udp_socket, payload, sizeof(ubx_nav_pvt_t), 0, (struct sockaddr *)&daemon_addr, sizeof(daemon_addr));
+                                if(ret > 0)
+                                {
+                                    //printf("Send Sucess. : %d\n", ret);
+                                }
+                            }
                             #if 0
                             ubx_nav_pvt_t nav;
                             memcpy(&nav, payload, sizeof(nav));

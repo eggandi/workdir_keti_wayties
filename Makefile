@@ -120,17 +120,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named pro_pcap
+# Target rules for targets named keti_pcap
 
 # Build rule for target.
-pro_pcap: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 pro_pcap
-.PHONY : pro_pcap
+keti_pcap: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 keti_pcap
+.PHONY : keti_pcap
 
 # fast build rule for target.
-pro_pcap/fast:
-	$(MAKE) $(MAKESILENT) -f src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/build.make src/app/KETI_PRO/CMakeFiles/pro_pcap.dir/build
-.PHONY : pro_pcap/fast
+keti_pcap/fast:
+	$(MAKE) $(MAKESILENT) -f src/app/KETI_PRO/CMakeFiles/keti_pcap.dir/build.make src/app/KETI_PRO/CMakeFiles/keti_pcap.dir/build
+.PHONY : keti_pcap/fast
 
 # Help Target
 help:
@@ -140,7 +140,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... pro_pcap"
+	@echo "... keti_pcap"
 .PHONY : help
 
 
