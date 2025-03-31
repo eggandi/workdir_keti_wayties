@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
     }
     pthread_cancel(g_thread_gnss);
 out:
-    LTEV2XHAL_Close();
+    //LTEV2XHAL_Close();
     if(G_pro_config.pcap.pcap_enable == true)
     {
         do{
@@ -160,6 +160,7 @@ static void PRO_Main_Signal_Set()
     sig_action.sa_handler = PRO_Main_Signal_Handler;
     sigemptyset(&sig_action.sa_mask);
     sig_action.sa_flags = 0;
+
     sigaction(SIGINT, &sig_action, NULL);
     sigaction(SIGHUP, &sig_action, NULL);
     sigaction(SIGTERM, &sig_action, NULL);
@@ -179,7 +180,7 @@ extern void PRO_Main_Signal_Handler(int signo)
             printf("Signal %d received. Exit.\n", signo);
             (void)signo;
             G_pro_config.v2x.tx_running = false;
-            LTEV2XHAL_Close();
+            //LTEV2XHAL_Close();
             if(g_sockfd > 0)
                 close(g_sockfd);
             exit(0);
@@ -188,8 +189,8 @@ extern void PRO_Main_Signal_Handler(int signo)
         }
         default:
         {
-            system("killall pro_pcap");
             exit(0);
+            system("killall pro_pcap");
             break;
         }
     }
