@@ -94,7 +94,11 @@ extern int PRO_Config_Setup_Configuration_Read(struct pro_config_t *pro_config)
         fputs("UDP_PORT_V2X=14000;\n", config_fp);
         fputs("UDP_PORT_GNSS=13000;\n", config_fp);
         fputs("UDP_PORT_GNSS_DAEMON=12000;\n", config_fp);
+        fputs("UDP_GNSS_Include_UBX_Header=1;\n", config_fp);
         fputs("\n", config_fp);
+
+
+        
 #ifdef _D_MOUNT_USED
         fputs("----------------------------------------Utils---------------------------------------;\n", config_fp);
         fputs("----------------------------------------Mount;\n", config_fp);
@@ -261,6 +265,9 @@ extern int PRO_Config_Setup_Configuration_Read(struct pro_config_t *pro_config)
                     }else if(strcmp(ptr_name, "UDP_PORT_GNSS_DAEMON") == 0)
                     {
                         PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->udp_port_gnss_daemon);
+                    }else if(strcmp(ptr_name, "UDP_GNSS_Include_UBX_Header") == 0)
+                    {
+                        PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->udp_gnss_include_ubx_header);
                     }else if(strcmp(ptr_name, "Pcap_Enable") == 0)
                     {
                         PRO_Config_Setup_Configuration_Value_Input(type, ptr_value, value_len, (void*)&pro_config->pcap.pcap_enable);

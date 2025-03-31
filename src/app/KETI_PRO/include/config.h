@@ -35,6 +35,7 @@ struct pro_config_t {
     uint16_t udp_port_v2x;
     uint16_t udp_port_gnss;
     uint16_t udp_port_gnss_daemon;
+    bool udp_gnss_include_ubx_header;
 };
 
 #endif //?_D_HEADER_CONFIG

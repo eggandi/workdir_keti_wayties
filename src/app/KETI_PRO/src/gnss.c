@@ -110,7 +110,6 @@ extern void *PRO_UBLOX_Gnss_Thread(void *arg)
         // 바이트 스트림 파싱
         for (int i = 0; i < n; i++) {
             uint8_t c = buf[i];
-
             switch (state)
             {
             case STATE_SYNC1:
@@ -189,21 +188,38 @@ extern void *PRO_UBLOX_Gnss_Thread(void *arg)
                             if(usr_buf_pt != NULL)
                             {
                                 Pro_Buffer_Array_Push(payload, sizeof(ubx_nav_pvt_t), &id_gnss, NULL);
+
                             }
                             if(G_pro_config.udp_enable)
                             {
                                 int ret;
-                                ret = sendto(udp_socket, payload, sizeof(ubx_nav_pvt_t), 0, (struct sockaddr *)&gnss_addr, sizeof(gnss_addr));
-                                if(ret > 0)
+                                if(G_pro_config.udp_gnss_include_ubx_header)
                                 {
-                                    //printf("Send Sucess. : %d\n", ret);
+                                    ret = sendto(udp_socket, buf, sizeof(ubx_nav_pvt_t) + 6, 0, (struct sockaddr *)&gnss_addr, sizeof(gnss_addr));
+                                    if(ret > 0)
+                                    {
+                                        //printf("Send Sucess. : %d\n", ret);
+                                    }
+                                    usleep(5000);
+                                    ret = sendto(udp_socket, buf, sizeof(ubx_nav_pvt_t) + 6, 0, (struct sockaddr *)&daemon_addr, sizeof(daemon_addr));
+                                    if(ret > 0)
+                                    {
+                                        //printf("Send Sucess. : %d\n", ret);
+                                    }
+                                }else{
+                                    ret = sendto(udp_socket, payload, sizeof(ubx_nav_pvt_t), 0, (struct sockaddr *)&gnss_addr, sizeof(gnss_addr));
+                                    if(ret > 0)
+                                    {
+                                        //printf("Send Sucess. : %d\n", ret);
+                                    }
+                                    usleep(5000);
+                                    ret = sendto(udp_socket, payload, sizeof(ubx_nav_pvt_t), 0, (struct sockaddr *)&daemon_addr, sizeof(daemon_addr));
+                                    if(ret > 0)
+                                    {
+                                        //printf("Send Sucess. : %d\n", ret);
+                                    }
                                 }
-                                usleep(5000);
-                                ret = sendto(udp_socket, payload, sizeof(ubx_nav_pvt_t), 0, (struct sockaddr *)&daemon_addr, sizeof(daemon_addr));
-                                if(ret > 0)
-                                {
-                                    //printf("Send Sucess. : %d\n", ret);
-                                }
+
                             }
                             #if 0
                             ubx_nav_pvt_t nav;
