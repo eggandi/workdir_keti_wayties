@@ -5,8 +5,11 @@
 static void PRO_UBLOX_Trance_STR2BIN(char *hex, uint8_t *out_bin, int *out_len);
 static int PRO_UBLOX_Trance_HEX2DEC(char c);
 
+bool G_gpsd_task_isrun = false;
+
 extern void *PRO_UBLOX_Gnss_Thread(void *arg)
 {
+    G_gpsd_task_isrun = true;
     struct pro_buffer_t *usr_buf_pt = (struct pro_buffer_t *)arg;
     //PRO_UBLOX_Initial_Set();
     // 1) gpsd 서버에 TCP 연결
@@ -94,6 +97,7 @@ extern void *PRO_UBLOX_Gnss_Thread(void *arg)
         uint8_t str_buffer[2048] = {0};
         int n = recv(sockfd, str_buffer, sizeof(buf), 0);
         if (n < 0) {
+            G_gpsd_task_isrun = false;
             perror("recv");
             break;
         }
@@ -264,6 +268,7 @@ extern void *PRO_UBLOX_Gnss_Thread(void *arg)
     } // while
 
     close(sockfd);
+    G_gpsd_task_isrun = false;
     return 0;
 }
 

@@ -312,6 +312,7 @@ src/app/KETI_PRO/CMakeFiles/keti_pcap.dir/src/gnss.c.o: src/app/KETI_PRO/src/gns
   /usr/include/aarch64-linux-gnu/asm/errno.h \
   /usr/include/asm-generic/errno.h \
   /usr/include/asm-generic/errno-base.h \
+  /usr/lib/gcc/aarch64-linux-gnu/11/include/stdbool.h \
   /usr/include/fcntl.h \
   /usr/include/aarch64-linux-gnu/bits/fcntl.h \
   /usr/include/aarch64-linux-gnu/bits/fcntl-linux.h \
@@ -330,7 +331,6 @@ src/app/KETI_PRO/CMakeFiles/keti_pcap.dir/src/gnss.c.o: src/app/KETI_PRO/src/gns
   /usr/include/aarch64-linux-gnu/bits/termios-misc.h \
   /usr/include/aarch64-linux-gnu/sys/ttydefaults.h \
   src/app/KETI_PRO/include/buffer.h \
-  /usr/lib/gcc/aarch64-linux-gnu/11/include/stdbool.h \
   src/app/KETI_PRO/include/config.h \
   /usr/include/aarch64-linux-gnu/sys/stat.h \
   /usr/include/pthread.h \

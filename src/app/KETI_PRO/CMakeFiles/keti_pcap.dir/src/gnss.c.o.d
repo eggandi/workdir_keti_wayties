@@ -79,7 +79,8 @@ src/app/KETI_PRO/CMakeFiles/keti_pcap.dir/src/gnss.c.o: \
  /usr/include/aarch64-linux-gnu/bits/errno.h /usr/include/linux/errno.h \
  /usr/include/aarch64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
- /usr/include/fcntl.h /usr/include/aarch64-linux-gnu/bits/fcntl.h \
+ /usr/lib/gcc/aarch64-linux-gnu/11/include/stdbool.h /usr/include/fcntl.h \
+ /usr/include/aarch64-linux-gnu/bits/fcntl.h \
  /usr/include/aarch64-linux-gnu/bits/fcntl-linux.h \
  /usr/include/aarch64-linux-gnu/bits/stat.h \
  /usr/include/aarch64-linux-gnu/bits/struct_stat.h /usr/include/termios.h \
@@ -95,7 +96,6 @@ src/app/KETI_PRO/CMakeFiles/keti_pcap.dir/src/gnss.c.o: \
  /usr/include/aarch64-linux-gnu/bits/termios-misc.h \
  /usr/include/aarch64-linux-gnu/sys/ttydefaults.h \
  /root/ws_pcap/src/app/KETI_PRO/include/buffer.h \
- /usr/lib/gcc/aarch64-linux-gnu/11/include/stdbool.h \
  /root/ws_pcap/src/app/KETI_PRO/include/config.h \
  /usr/include/aarch64-linux-gnu/sys/stat.h /usr/include/pthread.h \
  /usr/include/sched.h /usr/include/aarch64-linux-gnu/bits/sched.h \

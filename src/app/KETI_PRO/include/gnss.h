@@ -5,7 +5,7 @@
 #include <arpa/inet.h> // 사용된 함수: inet_pton, htons
 #include <unistd.h>    // 사용된 함수: close, write (및 기타 POSIX API)
 #include <errno.h>     // 사용된 변수: errno (perror 내부에서 사용)
-
+#include <stdbool.h>
 #include <fcntl.h>     // 사용된 함수/매크로: open, O_RDWR, O_NOCTTY, O_SYNC
 #include <termios.h>   // 사용된 매크로: B115200 (시리얼 통신 설정 등)
 
@@ -61,6 +61,6 @@ typedef struct {
 
 #endif //?_D_HEADER_GNSS
 
-
+extern bool G_gpsd_task_isrun;
 extern void *PRO_UBLOX_Gnss_Thread(void *arg);
 extern int PRO_UBLOX_Initial_Set();

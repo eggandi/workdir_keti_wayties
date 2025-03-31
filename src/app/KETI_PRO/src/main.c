@@ -25,7 +25,9 @@ int main(int argc, char *argv[])
         printf("Configuration read failed.\n");
         return -1;
     }
+
     PRO_Main_Signal_Set();
+
     if(G_pro_config.utils.mount.active_mode == true)
     {
         pthread_create(&g_thread_sdcard_active_mount, NULL, PRO_Utils_Mount_Active_Mode, NULL);
@@ -89,7 +91,6 @@ int main(int argc, char *argv[])
     }else{
         pthread_create(&g_thread_gnss, NULL, PRO_UBLOX_Gnss_Thread, (void*)NULL);
     }
-    
     pthread_detach(g_thread_gnss);
 
 	struct itimerspec itval;
@@ -103,6 +104,7 @@ int main(int argc, char *argv[])
     timerfd_settime(time_fd, TFD_TIMER_ABSTIME, &itval, NULL);
     uint64_t res;
     uint64_t pcap_num = 0;
+
     while(1)
     {
         ret = read(time_fd, &res, sizeof(res));
@@ -111,6 +113,14 @@ int main(int argc, char *argv[])
             perror("read");
             break;
         }
+        //20250331 PRO_UBLOX_Gnss_Thread 테스크 종류(세션오류 등으로)되면 재실행
+        if(G_gpsd_task_isrun == false)
+        {
+            pthread_cancel(g_thread_gnss);
+            pthread_create(&g_thread_gnss, NULL, PRO_UBLOX_Gnss_Thread, (void*)NULL);
+            pthread_detach(g_thread_gnss);
+        }
+
         if(G_pro_config.pcap.pcap_enable == true)
         {
             do{
@@ -128,8 +138,9 @@ int main(int argc, char *argv[])
         }
             
     }
-    pthread_cancel(g_thread_gnss);
+
 out:
+//20250331 시그널 오류시 루프 문제로 주석처리
     //LTEV2XHAL_Close();
     if(G_pro_config.pcap.pcap_enable == true)
     {
@@ -180,6 +191,7 @@ extern void PRO_Main_Signal_Handler(int signo)
             printf("Signal %d received. Exit.\n", signo);
             (void)signo;
             G_pro_config.v2x.tx_running = false;
+//20250331 시그널 오류시 루프 문제로 주석처리
             //LTEV2XHAL_Close();
             if(g_sockfd > 0)
                 close(g_sockfd);

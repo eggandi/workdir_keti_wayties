@@ -109,6 +109,7 @@ void PRO_V2X_RxMSDUCallback(const uint8_t *msdu, LTEV2XHALMSDUSize msdu_size, st
     }
     
     memset(payload, 0x00, sizeof(payload));
+    free(wsdu)
   }
   // 수신 파라미터 출력
   #if 0
@@ -120,7 +121,8 @@ void PRO_V2X_RxMSDUCallback(const uint8_t *msdu, LTEV2XHALMSDUSize msdu_size, st
       rx_params.src_l2_id,
       rx_params.dst_l2_id);
   #endif
-
+  if
+  
   return;
 }
 
